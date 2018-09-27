@@ -15,11 +15,17 @@ ENV LOGLEVEL_VERSION v0.1
 ENV TINI_VERSION v0.18.0
 ENV TELEMETRY_VERSION v0.5.1
 
-RUN curl -sLf https://github.com/rancher/machine-package/releases/download/${CATTLE_MACHINE_VERSION}/docker-machine.tar.gz | tar xvzf - -C /usr/bin && \
-    curl -sLf https://github.com/rancher/loglevel/releases/download/${LOGLEVEL_VERSION}/loglevel-amd64-${LOGLEVEL_VERSION}.tar.gz | tar xvzf - -C /usr/bin && \
-    curl -sLf https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini > /usr/bin/tini && \
-    curl -sLf https://github.com/rancher/helm/releases/download/${CATTLE_HELM_VERSION}/helm > /usr/bin/helm && \
-    curl -sLf https://github.com/rancher/telemetry/releases/download/${TELEMETRY_VERSION}/telemetry > /usr/bin/telemetry && \
+#RUN curl -sLf https://github.com/rancher/machine-package/releases/download/${CATTLE_MACHINE_VERSION}/docker-machine.tar.gz | tar xvzf - -C /usr/bin && \
+#    curl -sLf https://github.com/rancher/loglevel/releases/download/${LOGLEVEL_VERSION}/loglevel-amd64-${LOGLEVEL_VERSION}.tar.gz | tar xvzf - -C /usr/bin && \
+#    curl -sLf https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini > /usr/bin/tini && \
+#    curl -sLf https://github.com/rancher/helm/releases/download/${CATTLE_HELM_VERSION}/helm > /usr/bin/helm && \
+#    curl -sLf https://github.com/rancher/telemetry/releases/download/${TELEMETRY_VERSION}/telemetry > /usr/bin/telemetry && \
+#    chmod +x /usr/bin/helm /usr/bin/tini /usr/bin/telemetry
+
+COPY docker-machine.tar.gz loglevel-amd64-v0.1.tar.gz tini helm telemetry 2.0.67.tar.gz  /tmp/
+RUN tar xvzf /tmp/docker-machine.tar.gz -C /usr/bin && \
+    tar xvzf /tmp/loglevel-amd64-v0.1.tar.gz -C /usr/bin && \
+    cp /tmp/tini /tmp/helm /tmp/telemetry /usr/bin && \
     chmod +x /usr/bin/helm /usr/bin/tini /usr/bin/telemetry
 
 ENV CATTLE_UI_PATH /usr/share/rancher/ui
@@ -33,9 +39,14 @@ ENV AUDIT_LOG_MAXBACKUP 10
 ENV AUDIT_LOG_MAXSIZE 100
 ENV AUDIT_LEVEL 0
 
+#RUN mkdir -p /usr/share/rancher/ui && \
+#    cd /usr/share/rancher/ui && \
+#    curl -sL https://releases.rancher.com/ui/${CATTLE_UI_VERSION}.tar.gz | tar xvzf - --strip-components=1 && \
+#    cd /var/lib/rancher
+
 RUN mkdir -p /usr/share/rancher/ui && \
     cd /usr/share/rancher/ui && \
-    curl -sL https://releases.rancher.com/ui/${CATTLE_UI_VERSION}.tar.gz | tar xvzf - --strip-components=1 && \
+    tar xvzf /tmp/2.0.67.tar.gz --strip-components=1 && \
     cd /var/lib/rancher
 
 ENV CATTLE_CLI_URL_DARWIN  https://releases.rancher.com/cli/${CATTLE_CLI_VERSION}/rancher-darwin-amd64-${CATTLE_CLI_VERSION}.tar.gz
